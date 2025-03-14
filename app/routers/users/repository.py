@@ -8,6 +8,10 @@ from security.encryptors import encrypt_password
 
 
 class UserRepository:
+    """
+    Data Access Object that interacts with database instances of User
+    """
+
     def __init__(self, session: Session):
         self.session = session
 

@@ -13,6 +13,10 @@ from security.token import create_access_token
 
 
 class UserWebController:
+    """
+    Controller level class that implements business logic for User instances
+    """
+
     def __init__(self, session: Session):
         self.repo = UserRepository(session=session)
         self.session = session
@@ -20,7 +24,12 @@ class UserWebController:
     def create_user(
             self,
             user_data: UserData,
-    ):
+    ) -> Token:
+        """
+        Creates user
+        :param user_data: user credentials
+        :return: user data with id
+        """
         try:
             self.repo.create_user(user_data=user_data)
             self.session.commit()
@@ -34,14 +43,18 @@ class UserWebController:
 
         return Token(access_token=access_token, token_type="bearer")
 
-
-    def login(self, creds):
-        user = self.repo.get_user_by_email(creds.email)
+    def login(self, user_data: UserData) -> Token:
+        """
+        Authenticates use
+        :param user_data:
+        :return:
+        """
+        user = self.repo.get_user_by_email(user_data.email)
 
         if user is None:
             raise AuthenticationError("Incorrect username or password")
 
-        if not verify_password(creds.password, user.password):
+        if not verify_password(user_data.password, user.password):
             raise AuthenticationError("Incorrect username or password")
 
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
